@@ -1,25 +1,3 @@
-"""
-Crear una clase Empleado con atributos:
-
-nombre (string)
-
-edad (int)
-
-puesto (string)
-
-Implementar un método dentro de la clase que devuelva un string con los datos del empleado 
-(ejemplo: "Empleado: Ana, 30 años, puesto: Desarrolladora").
-
-Crear una lista vacía empleados = [] que servirá como “base de datos”.
-
-Hacer un menú en consola que permita al usuario:
-
-1. Agregar empleado (pide datos por input y lo agrega a la lista).
-
-2. Listar empleados (muestra todos en consola).
-
-3. Salir.
-"""
 #clase empleado y método
 class Empleado:
     def __init__(self, nombre, edad, puesto):
@@ -42,7 +20,10 @@ class Tarea:
 
     def mostrar_tarea(self):
         status = "Completado" if self.completado else "Incompleto"
-        return f"{self.titulo}\n   Asignado a: {self.empleado_asignado}\n   Status: {status}"
+        return f"{self.titulo}\n   Asignado a: {self.empleado_asignado.solo_nombre_empleado()}\n   Status: {status}"
+
+    def solo_nombre_empleado(self):
+        return self.nombre
 
 #lista vacia
 todos_empleados = []
@@ -89,8 +70,10 @@ def eliminar_empleado():
 def administrador_tareas():
     while True:
         print("\n=== Administrador de tareas ===")
-        print("1. Crear tarea")
-        print("2. Mostrar tareas")
+        print("1. Crear tarea.")
+        print("2. Mostrar tareas.")
+        print("3. Marcar tareas como completadas.")
+        print("4. Eliminar tareas.")
         print("0. Atrás")
         try:
             option = int(input("Elige una opción: "))
@@ -104,18 +87,32 @@ def administrador_tareas():
                 agregar_tarea()
             case 2:
                 mostrar_tarea()
+            case 3:
+                marcar_completo_tarea()
+            case 4:
+                eliminar_tarea()
             case _:
                 print("Opción inválida\n\n")
 
 def agregar_tarea():
     nombre_tarea = input("Nombre de la tarea: ")
     descripcion_tarea = input("Descripción de la tarea: \n")
-    empleado_asignado = input("Nombre del empleado asignado: ")
+    nombre_empleado = input("Nombre del empleado asignado: ")
     status = False
 
-    nueva_tarea = Tarea(nombre_tarea, descripcion_tarea, Empleado., status)
+    empleado_asignado = None
+    for i in todos_empleados:
+        if i.nombre == nombre_empleado:
+            empleado_asignado = i
+            break
+
+    if empleado_asignado is None:
+        print(f"No se encontró el nombre {nombre_empleado}")
+        return
+
+    nueva_tarea = Tarea(nombre_tarea, descripcion_tarea, empleado_asignado, status)
     todas_tareas.append(nueva_tarea)
-    print("Tarea creada")
+    print("Tarea creada.")
 
 def mostrar_tarea():
     if not todas_tareas:
@@ -126,9 +123,61 @@ def mostrar_tarea():
         for i, task in enumerate(todas_tareas, start = 1):
             print(f"{i}. {task.mostrar_tarea()}")
 
+def marcar_completo_tarea():
+    if not todas_tareas:
+        print("===== Lista de Tareas =====")
+        print("No hay tareas registradas")
+        return
+
+    print("===== Lista de Tareas =====")
+    # Mostrar solo las tareas incompletas
+    tareas_incompletas = [task for task in todas_tareas if not task.completado]
+
+    if not tareas_incompletas:
+        print("Todas las tareas ya están completas 🎉")
+        return
+
+    for i, task in enumerate(tareas_incompletas, start=1):
+        print(f"{i}. {task.mostrar_tarea()}")
+
+    while True:
+        try:
+            idx = int(input("Ingresa el índice de la tarea que quieres marcar como completa: "))
+            if 1 <= i <= len(tareas_incompletas):
+                tarea = tareas_incompletas[i - 1]
+                tarea.completado = True
+                print(f"✅ La tarea '{tarea.titulo}' fue marcada como completada.")
+                break
+            else:
+                print("Índice fuera de rango.")
+        except ValueError:
+            print("Por favor, ingresa un número válido.")
+
+def eliminar_tarea():
+    if not todas_tareas:
+        print("===== Lista de Tareas =====")
+        print("No hay tareas registradas")
+        return
+    else:
+        print("===== Lista de Tareas =====")
+        for i, task in enumerate(todas_tareas, start = 1):
+            print(f"{i}. {task.mostrar_tarea()}")
+    while True:
+        try:
+            tarea_eliminar = int(input("¿Qué tarea deseas eliminar? (índice): "))
+
+            if 1 <= tarea_eliminar <= len(todas_tareas):  # Validar índice
+                tarea = todas_tareas.pop(tarea_eliminar - 1)  # quitar de la lista
+                print(f"Tarea '{tarea.titulo}' eliminada")
+                break
+            else:
+                print("Índice fuera de rango. Intenta de nuevo.")
+        except ValueError:
+            print("Dato inválido. Ingresa un número.")
 
 
 
+#Menú principal
 def menu():
     while True:
         print("\n======= Menú de Gestión de Empleados =======")
